@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Line Styles</title>
+		<meta charset="utf-8">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.0.2/jszip-utils.js"></script>
+		<!-- <script src="script/utils.js"></script> -->
+		<style>
+			canvas {
+				-moz-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="width:75%;">
+			<canvas id="canvas"></canvas>
+		</div>
+		
+
+<script>
+			
+			$(document).ready(function() {
+				var titles   = [];
+				var ecolis   = [];
+				var points   = [];
+				var collects = [];
+
+				var coleta = [];
+
+				$.getJSON("../ima/rasp.php", function(dados) {
+					// console.log(dados);
+					var lineT = [];
+					var colorslist = ["","blue","","orange","","magenta","","green","","black","","navy","","yellow","","red"];
+					$.each(dados, function(i, iValue) {
+						console.log(iValue);
+						var series = [];
+						if (i % 2 == 0) {
+							var ecoli = [];
+							var dataEcoli = [];
+							$.each(dados[i], function(j, jValue) {
+								ecoli.push(jValue.ecoli);
+								dataEcoli.push(jValue.data);
+							});
+
+							series = ecoli;
+							lineT = dataEcoli;
+						}
+						
+						var colors = '';
+						var point_collect = '';
+						
+						if (series.length != 0) {
+							point_collect = dados[i-1].Ponto_de_Coleta;
+							colors = colorslist[i-1];
+
+							points.push({
+								fill: false,
+								data: series.reverse(),
+								borderColor: colors,
+								label: point_collect,
+							});
+						}
+					});
+
+					// console.log(dados);
+					var dataLabels = lineT.reverse();
+					var dataSets = points;
+
+					new Chart(document.getElementById("canvas"), {
+						type: 'line',
+						data: {
+							labels: dataLabels,
+							datasets: dataSets
+						},
+						options: {
+							title: {
+								display: true,
+								text: 'CIDADE DE '+ dados[1].Municipio +' - '+ dados[1].Balneario
+							}
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+</html>
