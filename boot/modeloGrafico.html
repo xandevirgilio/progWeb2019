@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie-edge">
+    <title>Grafico</title>
+</head>
+    <body>
+        
+        <canvas class="line-chart"></canvas>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+        <script>
+
+
+        var cor = function(){
+            var r =Math.floor(Math.random()*255);
+            var g =Math.floor(Math.random()*255);
+            var b =Math.floor(Math.random()*255);
+            return 'rgb('+r+','+g+' ,' +b+')';
+        }
+
+            $.ajax({
+                url: 'dados.php', 
+                type: "GET", 
+                dataType: "json", 
+                success: function(data){
+                    console.log(data); // dados resultantes do request ao json
+                    var datascoletas = [];
+                    var datasets = [];
+                    $.each(data, function(key, ponto){
+                        // console.log(key+ ' = ' +ponto.descricao.Município);
+                        // console.log(key+ ' = ' +ponto.descricao.Balneário);
+                        // console.log(key+ ' = ' +ponto.coletas[1].data);
+                        
+                        var serie = {};  //representa uma linha do grafico (ponto da praia)
+                        var dadosSerie = [];
+                        console.log(ponto.coletas);
+                        $.each(ponto.coletas, function(pos, coleta){
+                            if(pos!=0){
+                                if(key == 3){
+                                    datascoletas.push(coleta.data);
+                                    
+                                }
+                                dadosSerie.push(coleta.ecoli);                                
+                            }
+                            
+                        })
+
+                        serie['label'] = ponto.descricao.Ponto_de_Coleta;
+                        serie['data'] = dadosSerie;
+                        serie['borderWidth'] = 6;
+                        serie['borderColor'] = cor();
+                        datasets.push(serie)
+                    })
+
+                    console.log(datasets);
+
+                    var ctx = document.getElementsByTagName("canvas");
+            
+                    var chartGraph = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+//                            labels: ["Jan","Fev","Mar"],
+                            labels: datascoletas,
+                            datasets: datasets
+                            //  [{
+                            //     label: "Taxa de cliques - 2019",
+                            //     data: [5,10,23],
+                            //     borderWidth: 6,
+                            //     borderColor: 'rgba(77,166,253,0.85)'
+                            // },{
+                            //     label: "Taxa de sucesso - 2019",
+                            //     data: [15,30,22],
+                            //     borderWidth: 6,
+                            //     borderColor: 'rgba(0,166,23,0.85)'
+                            // }
+                            // ]
+                        }
+                    });
+
+                    // var chartGraph = new Chart(ctx, {
+                    //     type: 'bar',
+                    //     data: {
+                    //         labels: ['tr','td'],
+                    //         datasets: [{
+                    //             label: "Taxa de cliques - 2019",
+                    //             data: ['ola'],
+                    //             borderWidth: 6,
+                    //             borderColor: 'rgba(77,166,253,0.85)'
+                    //         }]
+                    //     }             
+                    // });
+                }
+            });
+        </script>
+
+    </body>
+</html>
